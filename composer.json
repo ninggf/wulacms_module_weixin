@@ -1,0 +1,9 @@
+{
+  "name": "wula/weixin",
+  "description": "提供微信公众号、订阅号、企业号、第三方平台接入功能。并提供微信公众号开发的基本功能。",
+  "type": "wula-module",
+  "require": {
+	"wula/wula-installer": "^2.0",
+	"overtrue/wechat": "^4.0"
+  }
+}
