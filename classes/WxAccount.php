@@ -13,26 +13,64 @@ namespace weixin\classes;
 
 use EasyWeChat\Factory;
 use EasyWeChat\OfficialAccount\Application;
+use Psr\SimpleCache\InvalidArgumentException;
 use wulaphp\app\App;
 
+/**
+ * Class WxAccount
+ * @package weixin\classes
+ * @property-read Application $app      App
+ * @property-read string      $baseUrl  基本URL
+ * @property-read string      $appid    APPID
+ * @property-read string      $wxid     微信号
+ * @property-read string      $originId 原始ID
+ * @property-read string      $token
+ * @property-read string      $name
+ * @property-read string      $type
+ * @property-read bool        $authed
+ * @property-read bool        $debug
+ */
 class WxAccount {
 	public const TYPES = [
 		'DY' => '订阅号',
 		'FW' => '服务号',
 		'QY' => '企业号'
 	];
+	/**
+	 * @var \weixin\classes\WxAccount[]
+	 */
 	private static $accounts = [];
+	private static $infos    = [];
+	/**
+	 * @var \EasyWeChat\OfficialAccount\Application
+	 */
+	private $app;
+	/**
+	 * @var array
+	 */
+	private $info;
+	private $baseUrl;
+
+	private function __construct(Application $app, array $info) {
+		$this->app  = $app;
+		$this->info = $info;
+		if ($info['base_url']) {
+			$this->baseUrl = untrailingslashit($info['base_url']);
+		} else {
+			$this->baseUrl = untrailingslashit(App::cfg('base_url@wx'));
+		}
+		$this->info['base_url'] = $this->baseUrl;
+	}
 
 	/**
 	 * @param string $accid
 	 *
-	 * @return \EasyWeChat\OfficialAccount\Application
+	 * @return \weixin\classes\WxAccount
 	 */
-	public static function getWechat(string $accid): ?Application {
+	public static function getWechat(string $accid): ?WxAccount {
 		try {
 			if (!array_key_exists($accid, self::$accounts)) {
-				$db  = App::db();
-				$acc = $db->queryOne('SELECT * FROM {wx_account} WHERE id=%d LIMIT 0,1', $accid);
+				$acc = self::info($accid);
 				if (!$acc) {
 					self::$accounts[ $accid ] = null;
 
@@ -44,7 +82,7 @@ class WxAccount {
 					'token'         => $acc['token'],
 					'response_type' => 'array',
 					'log'           => [
-						'level' => APP_MODE == 'pro' ? 'error' : 'debug',
+						'level' => $acc['debug'] ? 'debug' : 'error',
 						'file'  => LOGS_PATH . '/wechat.log',
 					],
 					'http'          => [
@@ -58,12 +96,115 @@ class WxAccount {
 				}
 
 				$app                      = Factory::officialAccount($config);
-				self::$accounts[ $accid ] = $app;
+				$account                  = new self($app, $acc);
+				self::$accounts[ $accid ] = $account;
 			}
 
 			return self::$accounts[ $accid ];
 		} catch (\Exception $e) {
+			self::$accounts[ $accid ] = null;
+
 			return null;
+		}
+	}
+
+	/**
+	 * 获取系统默认的微信公众号.
+	 *
+	 * @return null|\weixin\classes\WxAccount
+	 */
+	public static function getDefaultWechat(): ?WxAccount {
+		try {
+			$wxid = App::cfg('wxid@wx');
+			if ($wxid) return self::getWechat($wxid);
+		} catch (\Exception $e) {
+		}
+
+		return null;
+	}
+
+	/**
+	 * 公众号信息.
+	 *
+	 * @param string $accid id或wxid
+	 *
+	 * @return array|null 公众号信息.
+	 */
+	public static function info(string $accid): ?array {
+		try {
+			if (!array_key_exists($accid, self::$infos)) {
+				//TODO: 将来这个地要加缓存，不能每次都从数据库读
+				$db = App::db();
+				if (preg_match('/^[1-9]\d*$/', $accid)) {
+					$acc = $db->queryOne('SELECT * FROM {wx_account} WHERE id=%d LIMIT 0,1', $accid);
+				} else {
+					$acc = $db->queryOne('SELECT * FROM {wx_account} WHERE wxid=%s LIMIT 0,1', $accid);
+				}
+				self::$infos[ $accid ] = $acc;
+			}
+
+			return self::$infos[ $accid ];
+		} catch (\Exception $e) {
+			self::$infos[ $accid ] = null;
+		}
+
+		return null;
+	}
+
+	/**
+	 * jssdk签名.
+	 *
+	 * @param array  $apis
+	 * @param string $url
+	 *
+	 * @return string
+	 */
+	public function wxSign(array $apis, string $url = ''): string {
+		try {
+			$app = $this->app;
+			$app->jssdk->setUrl($url);
+
+			return $app->jssdk->buildConfig($apis, $this->debug, false);
+		} catch (\Exception $e) {
+			log_warn($e->getMessage(), 'wx_sign');
+		} catch (InvalidArgumentException $e) {
+			log_warn($e->getMessage(), 'wx_sign');
+		}
+
+		return '';
+	}
+
+	/**
+	 * 生成URL.
+	 *
+	 * @param string $url
+	 *
+	 * @return string
+	 */
+	public function url(string $url): string {
+		return $this->baseUrl . App::url($url);
+	}
+
+	public function __get(string $name) {
+		switch ($name) {
+			case 'app':
+				return $this->app;
+			case 'appid':
+				return $this->info['app_id'];
+			case 'appsecret':
+				return $this->info['app_secret'];
+			case 'wxid':
+				return $this->info['wxid'];
+			case 'originId':
+				return $this->info['origin_id'];
+			case 'baseUrl':
+				return $this->info['base_url'];
+			case 'authed':
+				return $this->info['authed'] == 1;
+			case 'debug':
+				return $this->info['debug'] == 1;
+			default:
+				return $this->info[ $name ] ?? null;
 		}
 	}
 }

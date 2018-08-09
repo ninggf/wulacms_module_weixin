@@ -25,6 +25,7 @@ class IndexController extends Controller {
 		$wechat = WxAccount::getWechat($accid);
 		if ($wechat) {
 			try {
+				$wechat = $wechat->app;
 				fire('weixin\regMsgHandler', $wechat->server, $accid);
 				$resp = $wechat->server->serve();
 				$resp->send();

@@ -49,7 +49,6 @@ class WxAccountForm extends FormTable {
 	 * 头像
 	 * @var \backend\form\TextField
 	 * @type string
-	 * @required
 	 * @url
 	 * @layout 10,col-xs-12
 	 */
@@ -58,7 +57,6 @@ class WxAccountForm extends FormTable {
 	 * 公众号二维码
 	 * @var \backend\form\TextField
 	 * @type string
-	 * @required
 	 * @url
 	 * @layout 15,col-xs-12
 	 */
@@ -67,7 +65,6 @@ class WxAccountForm extends FormTable {
 	 * AppId
 	 * @var \backend\form\TextField
 	 * @type string
-	 * @required
 	 * @layout 20,col-xs-4
 	 */
 	public $app_id;
@@ -75,7 +72,6 @@ class WxAccountForm extends FormTable {
 	 * AppSecret
 	 * @var \backend\form\TextField
 	 * @type string
-	 * @required
 	 * @layout 20,col-xs-4
 	 */
 	public $app_secret;
@@ -119,22 +115,47 @@ class WxAccountForm extends FormTable {
 	 * @var \backend\form\TextField
 	 * @type string
 	 * @layout 22,col-xs-12
-	 * @note   当消息加载解密方式为非明文模式时将自动生成
+	 * @note   如果留空当消息加载解密方式为非明文模式时将自动生成
 	 */
 	public $aeskey;
 	/**
 	 * 回调地址
 	 * @var \backend\form\TextField
 	 * @type string
-	 * @required
-	 * @layout 25,col-xs-12
+	 * @layout 25,col-xs-8
+	 * @note   不填写时使用系统默认
 	 */
 	public $base_url;
 	/**
-	 * 公众号描述
-	 * @var \backend\form\TextareaField
-	 * @type string
-	 * @layout 30,col-xs-12
+	 * 调试模式
+	 * @var \backend\form\SelectField
+	 * @type int
+	 * @see    param
+	 * @dsCfg  1=开启&0=关闭
+	 * @layout 25,col-xs-4
 	 */
-	public $desc;
+	public $debug = 0;
+
+	/**
+	 * 更新公众号.
+	 *
+	 * @param array  $data
+	 * @param string $id
+	 *
+	 * @return bool
+	 */
+	public function updateAccount(array $data, string $id) {
+		return $this->update($data, $id);
+	}
+
+	/**
+	 * 新增公众号.
+	 *
+	 * @param array $data
+	 *
+	 * @return bool
+	 */
+	public function newAccount(array $data) {
+		return $this->insert($data);
+	}
 }

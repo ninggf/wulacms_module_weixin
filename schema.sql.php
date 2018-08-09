@@ -16,6 +16,7 @@ $tables ['1.0.0'] [] = "CREATE TABLE IF NOT EXISTS `{prefix}wx_account` (
     `token` VARCHAR(24) NOT NULL COMMENT 'Token',
     `aeskey` VARCHAR(43) NULL COMMENT 'EncodingAESKey',
     `mode` ENUM('T', 'C', 'S') NOT NULL DEFAULT 'T' COMMENT 'T:明文模式; C:兼容模式;S:安全模式',
+    `debug` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '测试状态',
     `base_url` VARCHAR(128) NULL COMMENT 'base url',
     `create_time` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '创建时间',
     `create_uid` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT '创建用户',
