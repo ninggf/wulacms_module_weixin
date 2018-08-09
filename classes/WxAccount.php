@@ -160,7 +160,7 @@ class WxAccount {
 	 *
 	 * @return array|null
 	 */
-	public static function cfg(string $accid, ?&$acc = null): ?array {
+	public static function cfg(string $accid, &$acc = null): ?array {
 		$acc = self::info($accid);
 		if (!$acc) return null;
 		$config = [
