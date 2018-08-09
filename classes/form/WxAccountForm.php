@@ -10,6 +10,7 @@
 
 namespace weixin\classes\form;
 
+use weixin\classes\WxAccount;
 use wulaphp\form\FormTable;
 use wulaphp\validator\JQueryValidator;
 
@@ -87,8 +88,7 @@ class WxAccountForm extends FormTable {
 	 * 公众号类型
 	 * @var \backend\form\SelectField
 	 * @type string
-	 * @see    param
-	 * @dsCfg  DY=订阅号&FW=服务号&QY=企业号
+	 * @dsCfg ::getTypes
 	 * @layout 21,col-xs-4
 	 */
 	public $type = 'DY';
@@ -135,6 +135,10 @@ class WxAccountForm extends FormTable {
 	 * @layout 25,col-xs-4
 	 */
 	public $debug = 0;
+
+	public function getTypes() {
+		return WxAccount::TYPES;
+	}
 
 	/**
 	 * 更新公众号.

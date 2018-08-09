@@ -7,7 +7,7 @@ $tables ['1.0.0'] [] = "CREATE TABLE IF NOT EXISTS `{prefix}wx_account` (
     `name` VARCHAR(128) NOT NULL COMMENT '公众号名称',
     `wxid` VARCHAR(64) NOT NULL COMMENT '微信号',
     `origin_id` VARCHAR(32) NOT NULL COMMENT '原始ID',
-    `type` ENUM('DY', 'FW', 'QY') NOT NULL DEFAULT 'DY' COMMENT 'DY:订阅号，FW:服务号，QY:企业',
+    `type` ENUM('DY', 'FW', 'QY','XC','XY','OP','SF') NOT NULL DEFAULT 'DY' COMMENT 'DY:订阅号，FW:服务号，QY:企业,XC:小程序,XY:小游戏，OP:开放平台，第三方',
     `authed` TINYINT NOT NULL DEFAULT 0 COMMENT '是否认证',
     `avatar` VARCHAR(256) NULL COMMENT '头像',
     `qrcode` VARCHAR(256) NULL COMMENT '二维码',
