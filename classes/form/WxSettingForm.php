@@ -31,4 +31,12 @@ class WxSettingForm extends FormTable {
 	 * @layout 3,col-xs-12
 	 */
 	public $wxid;
+
+	/**
+	 * 默认小程序微信号
+	 * @var \backend\form\TextField
+	 * @type string
+	 * @layout 4,col-xs-12
+	 */
+	public $wxapp_id;
 }
