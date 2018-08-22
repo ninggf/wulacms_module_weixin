@@ -34,8 +34,8 @@ use weixin\classes\WxappUtil;
 use wulaphp\util\RedisLock;
 
 /**
- * Class UcenterApi
- * @package lucky\api\v1
+ * Class WxappApi
+ * @package weixin\api\v1
  * @name 小程序
  */
 class WxappApi extends API {
@@ -107,7 +107,7 @@ class WxappApi extends API {
 	 * "url": 'ssddd.png'
 	 * }
 	 */
-	public function createScenePost($token, $type, $scene, $page = '', $width = '', $auto_color = '', $is_hyaline = '') {
+	public function createScenePost($token, $type, $scene, $page = '', $width = 0, $auto_color = 0, $is_hyaline = 0) {
 		if (!$token || !$type || !$scene) {
 			$this->error(404, '参数缺失');
 		}
@@ -116,7 +116,7 @@ class WxappApi extends API {
 			$this->error(406, '用户不存在');
 		}
 		$mid      = $info['uid'];
-		$lock_key = 'wxapp_create_scene_qr_lock_' . $mid;
+		$lock_key = 'scene_qr_lock_' . $mid;
 		$lock     = RedisLock::ulock($lock_key);
 		if ($lock) {
 			try {
