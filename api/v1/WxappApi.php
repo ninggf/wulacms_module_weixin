@@ -31,6 +31,7 @@ namespace weixin\api\v1;
 use passport\classes\model\OauthSessionTable;
 use rest\classes\API;
 use weixin\classes\WxappUtil;
+use wulaphp\app\App;
 use wulaphp\util\RedisLock;
 
 /**
@@ -145,6 +146,39 @@ class WxappApi extends API {
 			}
 		}
 		$this->error(405, '请求太快了,亲');
+	}
+
+	/**
+	 * 小程序
+	 * @apiName 渠道统计
+	 *
+	 * @param string $channel (required) 渠道名
+	 *
+	 * @error   404=>参数缺少
+	 * @error   405=>用户不存在
+	 *
+	 * @paramo  int status 0成功
+	 *
+	 * @throws
+	 * @return array {
+	 * "status": 0
+	 * }
+	 */
+	public function channel($channel) {
+		if (!$channel) {
+			$this->error(404, '参数缺失');
+		}
+		try {
+			$db  = App::db();
+			$rst = $db->cud('UPDATE {wx_channel} SET click_num=click_num+1 WHERE channel=%s ', $channel);
+			if ($rst) {
+				return ['status' => 0];
+			} else {
+				$this->error(405, '无效渠道');
+			}
+		} catch (\Exception $e) {
+			$this->error(500, '请求失败了');
+		}
 	}
 
 }

@@ -27,3 +27,13 @@ $tables ['1.0.0'] [] = "CREATE TABLE IF NOT EXISTS `{prefix}wx_account` (
     UNIQUE INDEX `UDX_WXID` (`wxid` ASC),
     UNIQUE INDEX `UDX_TOKEN` (`token` ASC)
 )  ENGINE=INNODB DEFAULT CHARACTER SET={encoding} COMMENT='微信账户（服务号，订阅号，企业号，第三方'";
+
+$tables['1.0.0'][] = "CREATE TABLE `{prefix}wx_channel` (
+  `channel` varchar(100) NOT NULL COMMENT '渠道标记',
+  `channel_name` varchar(100) NOT NULL COMMENT '渠道名字',
+  `click_num` int(11) NOT NULL DEFAULT '0' COMMENT '点击次数',
+  `create_time` int(10) NOT NULL DEFAULT '0',
+  `update_time` int(10) NOT NULL DEFAULT '0',
+  `deleted` tinyint(2) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`channel`)
+) ENGINE=InnoDB DEFAULT CHARSET={encoding} COMMENT='渠道统计';";
