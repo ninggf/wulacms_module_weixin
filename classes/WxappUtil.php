@@ -63,7 +63,7 @@ class WxappUtil {
 	public static function getFromId(int $mid) {
 		$redis = RedisClient::getRedis();
 		$key   = self::$FromIdKey . $mid;
-		$res   = $redis->rPop($key);
+		$res   = $redis->lPop($key);
 
 		return $res;
 	}
@@ -86,7 +86,7 @@ class WxappUtil {
 			@mkdir($root . App::cfg('upload_dir@media', 'files') . '/' . $group, 0777, true);
 		}
 		//保存的文件名
-		$save_name = $type . '_' . $mid . '.png';
+		$save_name = $type . '_' . $mid .'_'.$scene. '.png';
 		//保存在目录
 		$url_path = $root . App::cfg('upload_dir@media', 'files') . '/' . $group . '/';
 		//完整路径

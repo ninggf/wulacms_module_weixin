@@ -63,11 +63,6 @@ class WeixinModule extends CmfModule {
 				$acc->icon        = '&#xe672;';
 				$acc->data['url'] = App::url('weixin/account');
 			}
-			if ($passport->cando('m:wx/channel')) {
-				$acc              = $wx->getMenu('channel', '渠道统计', 2);
-				$acc->icon        = '&#xe672;';
-				$acc->data['url'] = App::url('weixin/channel');
-			}
 		}
 	}
 
